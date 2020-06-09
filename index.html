@@ -21,6 +21,11 @@
     <body>
         <h1>Variations du PIB prévues pour 2020</h1>
         <img id="Share" src="img/share.svg" alt="share">
+            <div class="flex-container" id="Downloadbanner">
+                <button class="toData active" id="G7btn" value="G7" onclick="drawChart(value)">G7</button>
+                <button class="toData" id="OECDbtn" onclick="drawChart(value)" value="OECD">OCDE</button>
+                <button class="toData" id="WORLDbtn" onclick="drawChart(value)" value="WORLD">Monde</button>
+            </div>
         <div id="GDPchart"></div>
         
         <div id="source" class="source">Source: <a class="source" href="https://data.oecd.org/gdp/real-gdp-forecast.htm" target="_blank">Real GDP forecast (indicator)</a>. © OECD <a class="source" href="http://www.oecd.org/termsandconditions" target="_blank">Terms & Conditions</a></div>
@@ -39,8 +44,11 @@
         </div>
     </body>
     <script>
-    var data=[];
-
+        var dataPerm = [];
+        var valueButton = "G7"
+        var G7list = ["CAN", "FRA", "DEU", "ITA", "JPN", "GBR", "USA", "EA17"]
+        var OECDlist = ["AUS", "AUT", "BEL", "CAN,", "CHL", "COL", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "ISL", "IRL", "ISR", "ITA", "JPN", "KOR", "LVA", "LTU", "LUX", "MEX", "NLD", "NZL", "NOR", "POL", "PRT", "SVK", "SVN", "ESP", "SWE", "CHE", "TUR", "GBR", "USA", "OTO"]
+    
     var keys= ["scenario1", "diff"]
 
     var divMap = d3.select("body").append("div")
@@ -50,10 +58,10 @@
 
     var color = d3.scaleOrdinal()
         .domain(keys)
-        .range(["#0B68AF", "#E73741"])
+        .range(["#E73741", "#851017"])
 
   
-    var margin = { top: 130, right: 50, bottom: 30, left: 50 };
+    var margin = { top: 140, right: 50, bottom: 30, left: 50 };
 
     var mapRatio = 7 / 20;
 
@@ -61,9 +69,9 @@
 
     var height;
     if (width > 650)
-        height = 375//height = width * mapRatio;
+        height = 350//height = width * mapRatio;
     else
-        height = 375//height = width;
+        height = 350//height = width;
 
     var urls = {
         scenario1: "data/EO107_INTERNET_1.tsv",
@@ -88,9 +96,7 @@
         .paddingInner(0.05)
         .align(0.1);
 
-    if (width < 650)
-        x.paddingInner(0.5)
-
+   
     // set y scale
     var y = d3.scaleLinear()
         .rangeRound([height-margin.bottom, 0]);
@@ -112,23 +118,63 @@
                         countryName = "OCDE"
                     if (d.Country == "Zone euro (17 pays)")
                         countryName = "Zone euro"
-                    data.push({ "Country": countryName, "ISO": d.LOCATION, "scenario1":d.Value, "scenario2":k.Value, "diff": diffvalue})
+                    dataPerm.push({ "Country": countryName, "ISO": d.LOCATION, "scenario1":d.Value, "scenario2":k.Value, "diff": diffvalue})
                 }
             })
             if(count== scenario1Data.length)
-                drawChart()
+               drawChart(valueButton)
         })
-    }
-    function drawChart(){
-        GDPsvg.selectAll("*").remove();
+                }
 
+
+                var btnContainer = document.getElementById("Downloadbanner");
+                // Get all buttons with class="btn" inside the container
+                var btns = btnContainer.getElementsByClassName("toData");
+
+                // Loop through the buttons and add the active class to the current/clicked button
+                for (var i = 0; i < btns.length; i++) {
+                    btns[i].addEventListener("click", function () {
+                        var current = document.getElementsByClassName("active");
+                        current[0].className = current[0].className.replace(" active", "");
+                        this.className += " active";
+                    });
+                }
+
+                function drawChart(value) {
+                    GDPsvg.selectAll("*").remove();
+
+
+                    valueButton = value;
+                    var data = [];
+
+                    if (value == "G7") {
+                        G7list.forEach(function (d) {
+                            dataPerm.forEach(function (k) {
+                                if (d == k.ISO)
+                                    data.push(k)
+                            })
+
+                        })
+                    } else if (value == "OECD") {
+                        OECDlist.forEach(function (d) {
+                            dataPerm.forEach(function (k) {
+                                if (d == k.ISO)
+                                    data.push(k)
+                            })
+
+                        })
+                    } else {
+                        data = dataPerm
+                    }
+
+            
 
         width = document.getElementById("GDPchart").offsetWidth - margin.left - margin.right;
 
         if (width > 650)
-            height = 400//height = width * mapRatio;
+            height = 350//height = width * mapRatio;
         else
-            height = 400//height = width;
+            height = 350//height = width;
 
 
         d3.selectAll("svg")
@@ -141,10 +187,14 @@
         // set x scale
         x.rangeRound([0, width])
 
-        if (width < 650)
+       
+        if (width > 650 && valueButton != "G7")
+            x.paddingInner(0.05)
+        else if (width > 650 && valueButton == "G7")
             x.paddingInner(0.5)
-        
-
+        else if (width < 650)
+            x.paddingInner(0.5)
+            
         data.sort(function (a, b) { return a.scenario2 - b.scenario2; });
 
         x.domain(data.map(function (d) { return d.Country; }));
