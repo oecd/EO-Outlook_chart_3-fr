@@ -11,21 +11,15 @@
         <link rel="stylesheet" type="text/css" href="css/site.css">
         <script src="https://code.jquery.com/jquery-3.5.0.js"
             integrity="sha256-r/AaFHrszJtwpe+tHyNi/XCfMxYpbsRg2Uqn0x3s2zc=" crossorigin="anonymous"></script>
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
         <script src="libs/d3.v4.min.js"></script>
-        <script src="libs/d3.v4.jetpack.min.js"></script>
-        <script src="libs/d3-scale-chromatic.v1.min.js"></script>
-        <script src="libs/topojson.v1.min.js"></script>
         <script src="libs/d3-queue.v3.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
         <link rel="icon" href="img/favicon.ico">
 
     </head>
 
     <body>
-        <h1>PIB prévu pour 2020</h1>
+        <h1>Variations du PIB prévues pour 2020</h1>
         <img id="Share" src="img/share.svg" alt="share">
         <div id="GDPchart"></div>
         
@@ -67,10 +61,9 @@
 
     var height;
     if (width > 650)
-        height = width * mapRatio;
+        height = 375//height = width * mapRatio;
     else
-        height = width;
-
+        height = 375//height = width;
 
     var urls = {
         scenario1: "data/EO107_INTERNET_1.tsv",
@@ -127,6 +120,30 @@
         })
     }
     function drawChart(){
+        GDPsvg.selectAll("*").remove();
+
+
+        width = document.getElementById("GDPchart").offsetWidth - margin.left - margin.right;
+
+        if (width > 650)
+            height = 400//height = width * mapRatio;
+        else
+            height = 400//height = width;
+
+
+        d3.selectAll("svg")
+            .attr("width", width + margin.left + margin.right)
+
+        GDPsvg.append("g")
+            .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+        // set x scale
+        x.rangeRound([0, width])
+
+        if (width < 650)
+            x.paddingInner(0.5)
+        
 
         data.sort(function (a, b) { return a.scenario2 - b.scenario2; });
 
@@ -253,5 +270,6 @@
             .on("click", function () {
                 document.getElementById("shareLink").style.display = 'none';
             })
+    $(window).on('resize', drawChart);
 
     </script>
