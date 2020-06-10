@@ -61,7 +61,7 @@
         .range(["#E73741", "#851017"])
 
   
-    var margin = { top: 140, right: 50, bottom: 30, left: 50 };
+    var margin = { top: 145, right: 50, bottom: 30, left: 50 };
 
     var mapRatio = 7 / 20;
 
@@ -69,9 +69,9 @@
 
     var height;
     if (width > 650)
-        height = 350//height = width * mapRatio;
+        height = 345//height = width * mapRatio;
     else
-        height = 350//height = width;
+        height = 345//height = width;
 
     var urls = {
         scenario1: "data/EO107_INTERNET_1.tsv",
@@ -172,9 +172,9 @@
         width = document.getElementById("GDPchart").offsetWidth - margin.left - margin.right;
 
         if (width > 650)
-            height = 350//height = width * mapRatio;
+            height = 345//height = width * mapRatio;
         else
-            height = 350//height = width;
+            height = 345//height = width;
 
 
         d3.selectAll("svg")
